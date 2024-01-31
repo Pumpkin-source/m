@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Two-Player Ping Pong Game</title>
+  <title>Ping Pong inf</title>
   <style>
     body {
       margin: 0;
@@ -25,28 +25,27 @@
     const canvas = document.getElementById('pingPongCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Paddles
-    const paddleWidth = 10;
-    const paddleHeight = 60;
+    // Paddle
+    const paddleWidth = 8; // Reduce paddle width for better hit detection
+    const paddleHeight = 80;
     let leftPaddleY = canvas.height / 2 - paddleHeight / 2;
     let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
-    const paddleSpeed = 6;
+    let leftPaddleSpeedY = 0;
+    let rightPaddleSpeedY = 0;
+    const paddleAcceleration = 5; // Adjust this value for acceleration
+    const paddleDamping = 0.5; // Adjust this value for damping
 
     // Ball
     let ballX = canvas.width / 2;
     let ballY = canvas.height / 2;
     let ballSpeedX = 5;
     let ballSpeedY = 2;
-
-    // Acceleration
-    const acceleration = 0.5;
+    const maxBallSpeed = 12; // Maximum speed of the ball
+    const speedIncreaseFactor = 2;
 
     // Scores
-    let player1Score = 0;
-    let player2Score = 0;
-
-    // Key states
-    const keys = {};
+    let leftPlayerScore = 0;
+    let rightPlayerScore = 0;
 
     function draw() {
       // Clear the canvas
@@ -66,8 +65,8 @@
 
       // Draw scores
       ctx.font = '24px Arial';
-      ctx.fillText('Player 1: ' + player1Score, 50, 50);
-      ctx.fillText('Player 2: ' + player2Score, canvas.width - 200, 50);
+      ctx.fillText('Player: ' + leftPlayerScore, 50, 50);
+      ctx.fillText('Computor: ' + rightPlayerScore, canvas.width - 200, 50);
 
       // Move ball
       ballX += ballSpeedX;
@@ -83,36 +82,44 @@
         (ballX - 8 < paddleWidth && ballY > leftPaddleY && ballY < leftPaddleY + paddleHeight) ||
         (ballX + 8 > canvas.width - paddleWidth && ballY > rightPaddleY && ballY < rightPaddleY + paddleHeight)
       ) {
-        ballSpeedX = -ballSpeedX;
-        // Accelerate the ball when hit
-        ballSpeedX += ballSpeedX > 0 ? acceleration : -acceleration;
-        ballSpeedY += ballSpeedY > 0 ? acceleration : -acceleration;
+        if (ballX - 8 < paddleWidth) {
+          // Hit by the left paddle
+          ballX = paddleWidth + 8; // Set the ball position to the edge of the paddle
+        } else {
+          // Hit by the right paddle
+          ballX = canvas.width - paddleWidth - 8; // Set the ball position to the edge of the paddle
+        }
+
+        ballSpeedX = -ballSpeedX * speedIncreaseFactor;
+
+        // Cap the maximum speed of the ball
+        ballSpeedX = Math.min(ballSpeedX, maxBallSpeed);
       }
 
       // Check for scoring
       if (ballX - 8 < 0) {
         // Player 2 scores
-        player2Score++;
+        rightPlayerScore++;
         resetBall();
       } else if (ballX + 8 > canvas.width) {
         // Player 1 scores
-        player1Score++;
+        leftPlayerScore++;
         resetBall();
       }
 
-      // Move paddles based on key states
-      if (keys['KeyW']) {
-        leftPaddleY -= paddleSpeed;
+      // Move right paddle based on ball position (Unbeatable AI)
+      if (ballY > rightPaddleY + paddleHeight / 2) {
+        rightPaddleSpeedY += paddleAcceleration;
+      } else {
+        rightPaddleSpeedY -= paddleAcceleration;
       }
-      if (keys['KeyS']) {
-        leftPaddleY += paddleSpeed;
-      }
-      if (keys['ArrowUp']) {
-        rightPaddleY -= paddleSpeed;
-      }
-      if (keys['ArrowDown']) {
-        rightPaddleY += paddleSpeed;
-      }
+
+      // Apply damping to the AI paddle
+      rightPaddleSpeedY *= paddleDamping;
+
+      // Update paddle positions with acceleration
+      leftPaddleY += leftPaddleSpeedY;
+      rightPaddleY += rightPaddleSpeedY;
 
       // Ensure paddles stay within the canvas
       leftPaddleY = Math.max(0, Math.min(canvas.height - paddleHeight, leftPaddleY));
@@ -124,17 +131,28 @@
     function resetBall() {
       ballX = canvas.width / 2;
       ballY = canvas.height / 2;
-      // Randomize the ball's initial direction after scoring
-      ballSpeedX = Math.random() > 0.5 ? 5 : -5;
-      ballSpeedY = Math.random() > 0.5 ? 2 : -2;
+      ballSpeedX = 5;
+      ballSpeedY = 2;
     }
 
     function handleKeyDown(event) {
-      keys[event.code] = true;
+      switch (event.key) {
+        case 'w':
+          leftPaddleSpeedY = -paddleAcceleration;
+          break;
+        case 's':
+          leftPaddleSpeedY = paddleAcceleration;
+          break;
+      }
     }
 
     function handleKeyUp(event) {
-      keys[event.code] = false;
+      switch (event.key) {
+        case 'w':
+        case 's':
+          leftPaddleSpeedY = 0;
+          break;
+      }
     }
 
     document.addEventListener('keydown', handleKeyDown);
