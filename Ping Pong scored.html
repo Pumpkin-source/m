@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Two-Player Ping Pong Game</title>
+  <title>Two-Player Ping Pong</title>
   <style>
     body {
       margin: 0;
@@ -12,16 +12,48 @@
       align-items: center;
       height: 100vh;
       background-color: #000;
+      font-family: 'Arial', sans-serif;
     }
     canvas {
       border: 2px solid #fff;
+      display: block;
+      margin: auto;
+    }
+    #titleScreen {
+      text-align: center;
+    }
+    #startButton {
+      font-size: 18px;
+      padding: 10px 20px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    #colorForm {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <canvas id="pingPongCanvas" width="800" height="400"></canvas>
+  <div id="titleScreen">
+    <h1>Two-Player Ping Pong Game</h1>
+    <button id="startButton">Start Game</button>
+    <form id="colorForm">
+      <label for="paddleColor">Paddle Color:</label>
+      <input type="color" id="paddleColor" value="#fff">
+      <br>
+      <label for="ballColor">Ball Color:</label>
+      <input type="color" id="ballColor" value="#fff">
+      <br>
+      <label for="backgroundColor">Background Color:</label>
+      <input type="color" id="backgroundColor" value="#000">
+    </form>
+  </div>
+  <canvas id="pingPongCanvas" width="800" height="400" style="display:none;"></canvas>
 
   <script>
+    const titleScreen = document.getElementById('titleScreen');
+    const startButton = document.getElementById('startButton');
+    const colorForm = document.getElementById('colorForm');
     const canvas = document.getElementById('pingPongCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -51,7 +83,12 @@
     // Key states
     const keys = {};
 
-    let gameRunning = true;
+    // Colors
+    let paddleColor = '#fff';
+    let ballColor = '#fff';
+    let backgroundColor = '#000';
+
+    let gameRunning = false;
 
     function draw() {
       if (!gameRunning) {
@@ -59,22 +96,24 @@
       }
 
       // Clear the canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Draw paddles
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = paddleColor;
       ctx.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
       ctx.fillRect(canvas.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
 
       // Draw ball
       ctx.beginPath();
       ctx.arc(ballX, ballY, 8, 0, Math.PI * 2);
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = ballColor;
       ctx.fill();
       ctx.closePath();
 
       // Draw scores
       ctx.font = '24px Arial';
+      ctx.fillStyle = '#fff';
       ctx.fillText('Player 1: ' + player1Score, 50, 50);
       ctx.fillText('Player 2: ' + player2Score, canvas.width - 200, 50);
 
@@ -146,6 +185,11 @@
       ballSpeedY = Math.random() > 0.5 ? 2 : -2;
     }
 
+    function resetScores() {
+      player1Score = 0;
+      player2Score = 0;
+    }
+
     function handleKeyDown(event) {
       keys[event.code] = true;
     }
@@ -157,12 +201,38 @@
     function endGame(winner) {
       gameRunning = false;
       alert(`Game Over! ${winner} wins!`);
+      titleScreen.style.display = 'block';
+      canvas.style.display = 'none';
+      resetScores();
     }
+
+    startButton.addEventListener('click', () => {
+      gameRunning = true;
+      titleScreen.style.display = 'none';
+      canvas.style.display = 'block';
+      resetScores();
+      draw(); // Start the game loop
+    });
+
+    colorForm.addEventListener('input', (event) => {
+      const inputId = event.target.id;
+      const colorValue = event.target.value;
+
+      switch (inputId) {
+        case 'paddleColor':
+          paddleColor = colorValue;
+          break;
+        case 'ballColor':
+          ballColor = colorValue;
+          break;
+        case 'backgroundColor':
+          backgroundColor = colorValue;
+          break;
+      }
+    });
 
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
-
-    draw(); // Start the game loop
   </script>
 </body>
 </html>
