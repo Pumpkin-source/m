@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ping Pong Game</title>
+  <title>Two-Player Ping Pong Game</title>
   <style>
     body {
       margin: 0;
@@ -63,10 +63,10 @@
 
     // Paddles
     const paddleWidth = 10;
-    const paddleHeight = 80;
+    const paddleHeight = 60;
     let leftPaddleY = canvas.height / 2 - paddleHeight / 2;
     let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
-    const paddleSpeed = 10;
+    const paddleSpeed = 6;
 
     // Ball
     let ballX = canvas.width / 2;
@@ -75,14 +75,14 @@
     let ballSpeedY = 2;
 
     // Acceleration
-    const acceleration = 1.5;
+    const acceleration = 0.2;
 
     // Scores
     let player1Score = 0;
     let player2Score = 0;
 
     // Winning score
-    const winningScore = 8;
+    const winningScore = 5;
 
     // Key states
     const keys = {};
@@ -197,7 +197,7 @@
     }
 
     function handleKeyDown(event) {
-    keys[event.code] = true;
+      keys[event.code] = true;
     }
 
     function handleKeyUp(event) {
@@ -232,7 +232,7 @@
 
     function findLocalServer() {
   // Replace the following line with the actual URL of your WebSocket server
-  const wsUrl = ' https://pumpkin-source.github.io/ping/';
+  const wsUrl = 'https://pumpkin-source.github.io/ping/';
 
   serverWebSocket = new WebSocket(wsUrl);
 
