@@ -231,20 +231,20 @@
     });
 
     function findLocalServer() {
-  // Replace the following line with the actual URL of your WebSocket server
-  const wsUrl = 'https://pumpkin-source.github.io/ping/';
+      // Replace the following line with the actual URL of your WebSocket server
+      const wsUrl = 'https://pumpkin-source.github.io/ping/';
 
-  serverWebSocket = new WebSocket(wsUrl);
+      serverWebSocket = new WebSocket(wsUrl);
 
-  serverWebSocket.onopen = () => {
-    alert('Local server found!');
-    serverWebSocket.close();
-  };
+      serverWebSocket.onopen = () => {
+        alert('Local server found!');
+        serverWebSocket.close();
+      };
 
-  serverWebSocket.onerror = (error) => {
-    alert('No local server found.');
-  };
-}
+      serverWebSocket.onerror = (error) => {
+        alert('No local server found.');
+      };
+    }
 
     colorForm.addEventListener('input', (event) => {
       const inputId = event.target.id;
