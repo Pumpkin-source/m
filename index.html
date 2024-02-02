@@ -231,8 +231,8 @@
     });
 
     function findLocalServer() {
-      // Replace the following line with the actual URL of your WebSocket server
-      const wsUrl = 'https://pumpkin-source.github.io/ping/';
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      const wsUrl = `${wsProtocol}://${window.location.hostname}:${window.location.port}`;
 
       serverWebSocket = new WebSocket(wsUrl);
 
